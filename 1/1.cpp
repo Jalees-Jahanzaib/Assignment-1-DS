@@ -4,50 +4,51 @@
 #include <string.h>
 #include "mpi.h"
 #include <fstream>
+#include <iomanip>
 #include <bits/stdc++.h>
-#define Big 1000000
 using namespace std;
 
-typedef long long int ll;
 int main( int argc, char **argv ) {
-    int rank, size;
+ 
 
-
-    MPI_Init( &argc, &argv );
-
-    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
-    MPI_Comm_size( MPI_COMM_WORLD, &size );
-
-
-if(rank==0){
+   cout.precision(7);
+    MPI_Init(&argc, &argv); 
+	int rank,size;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	if(rank==0){
     int N;
     cin>>N;
-    for(int i=1;i<size;i++){
+    for(int i=1;i<size;i++)
     MPI_Send(&N,1,MPI_INT,i,0,MPI_COMM_WORLD);
-
-    }
-		ll sum=0;
-
+		double sum=0;
 		for(int i=1;i<size;i++){
-
-			ll temp;
-			MPI_Recv(&temp, 1, MPI_LONG,i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			double temp;
+			MPI_Recv(&temp, 1, MPI_DOUBLE,i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 			sum+=temp;
 		}
-		for(int i=1;i<N/size;i++){sum+=pow(i,-2)*Big;}
-        int arr1=(sum%Big);
-		cout<<sum/Big<<"."<<arr1<<endl;
+		for(int i=1;i<=N/size;i++){sum+=pow(i,-2);}
+           std::cout << std::fixed;
+   std::cout << std::fixed;
+
+		cout<<setprecision(6)<<sum<<endl;
+	}
+	else if(rank!=size-1){
+        int N;
+        MPI_Recv(&N, 1, MPI_INT,0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		int start=rank*(N/size);
+		double sum=0;
+		for(int i=start+1;i<=start+N/size;i++){sum+=pow(i,-2);}
+		MPI_Send(&sum,1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
 	}
 	else{
         int N;
         MPI_Recv(&N, 1, MPI_INT,0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
 		int start=rank*(N/size);
-		ll sum=0;
-		for(int i=start;i<=start+N/size;i++){sum+=pow(i,-2)*Big;}
-		MPI_Send(&sum,1, MPI_LONG, 0, 0, MPI_COMM_WORLD);
+		double sum=0;
+		for(int i=start+1;i<=N;i++){sum+=pow(i,-2);}
+		MPI_Send(&sum,1, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
 	}
-
-    MPI_Finalize();
+    MPI_Finalize(); 
     return 0;
 }
