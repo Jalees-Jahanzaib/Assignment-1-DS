@@ -1,1 +1,2 @@
 
+Jeslee baya ek implementation likhi maine 2X fast...par ek cheez pta chali us paper se QuickSort with optimal merge works faster than Seq Qsort agar yeh chutiya fact pehle pta hota toh wallah yehi nai kiya hota pehle hii kusu taavan.
