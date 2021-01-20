@@ -83,7 +83,6 @@ int main(int argc, char** argv) {
     else{
         int n;
         receive(n,rank-1);
-        FIN
         if(n!=INT_MAX){
         int arr[n];
         receive_array(arr,n,rank-1);
