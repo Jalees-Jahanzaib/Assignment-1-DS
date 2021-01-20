@@ -54,26 +54,34 @@ int get_pivot(int *arr, int low, int high)
     swap(arr[i + 1], arr[high]);
     return (i + 1);
 }
-void ParallelSort( int* arr,int size, int my_rank, int Level, int Max_Possible_Rank){
+void ParallelSort( int* arr,int arr_size, int my_rank, int Level, int Max_Possible_Rank){
     int Sharing_process_rank= my_rank+ pow(2,Level);
     Level++;
+        cout<<"Check"<<" "<<" 1"<<endl;
+
     if(Sharing_process_rank>Max_Possible_Rank){
         //perfrom Sequential Sort
-quicksort(arr,0,size-1);
+quicksort(arr,0,arr_size-1);
         return;
     }
-    int Pivot_Index=get_pivot(arr,0,size-1);
-    if(Pivot_Index<=size-Pivot_Index){
-        MPI_Send(&Pivot_Index,1,MPI_INT,Sharing_process_rank,Level,MPI_COMM_WORLD);
-        MPI_Send(arr,(Pivot_Index-1),MPI_INT,Sharing_process_rank,Level,MPI_COMM_WORLD);
-        ParallelSort(arr,(size-Pivot_Index+1),my_rank,Level,Max_Possible_Rank);
+    int Pivot_Index=get_pivot(arr,0,arr_size-1);
+    int start=0; 
+    while(Pivot_Index==start-1){
+        Pivot_Index=get_pivot(arr,start,arr_size-1);
+        start++;
+    }
+    cout<<"Pivot "<<Pivot_Index<<endl;
+    if(Pivot_Index<=arr_size-Pivot_Index){
+        MPI_Send(&Pivot_Index,1,MPI_INT,Sharing_process_rank,Pivot_Index,MPI_COMM_WORLD);
+        MPI_Send(arr,(Pivot_Index-1),MPI_INT,Sharing_process_rank,Pivot_Index,MPI_COMM_WORLD);
+        ParallelSort(arr,(arr_size-Pivot_Index+1),my_rank,Level,Max_Possible_Rank);
         MPI_Recv(&arr,(Pivot_Index-1),MPI_INT,Sharing_process_rank,MPI_ANY_TAG,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 
     }
     else{
-        int K=(size-Pivot_Index-1);
-        MPI_Send(&K,1,MPI_INT,Sharing_process_rank,Level,MPI_COMM_WORLD);
-        MPI_Send(arr,K,MPI_INT,Sharing_process_rank,Level,MPI_COMM_WORLD);
+        int K=(arr_size-Pivot_Index-1);
+        MPI_Send(&K,1,MPI_INT,Sharing_process_rank,Pivot_Index,MPI_COMM_WORLD);
+        MPI_Send(arr,K,MPI_INT,Sharing_process_rank,Pivot_Index,MPI_COMM_WORLD);
         ParallelSort(arr,K,my_rank,Level,Max_Possible_Rank);
         MPI_Recv(arr,(Pivot_Index-1),MPI_INT,Sharing_process_rank,MPI_ANY_TAG,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 
@@ -102,12 +110,12 @@ int main( int argc, char **argv ) {
 int N;
 cin>>N;
 int arr[N];
-    for(int i=1;i<size;i++)
+    for(int i=0;i<N;i++)
     {
         cin>>arr[i];
     }
     ParallelSort(arr,N,rank,Level,size-1);
-        for(int i=1;i<size;i++)
+        for(int i=0;i<N;i++)
     {
         cout<<arr[i]<<" ";
     }
@@ -129,3 +137,6 @@ int arr[N];
     MPI_Finalize(); 
     return 0;
 }
+
+
+// cout<<"Check"<<" "<<" 1"<<endl;
