@@ -54,69 +54,39 @@ int qsort(int *arr,int l,int r){
     }
     return 1;
 }
-int main( int argc, char **argv ) {
-    int rank, numprocs;
+/*.................................*/
 
-    /* start up MPI */
-    MPI_Init( &argc, &argv );
 
-    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
-    MPI_Comm_size( MPI_COMM_WORLD, &numprocs );
-    MPI_Barrier( MPI_COMM_WORLD );
-    double tbeg = MPI_Wtime();
 
-    /* write your code here */
+
+
+
+
+
+int main(int argc, char** argv) {
+    INIT
     if(rank==0){
+        int n;cin>>n;int arr[n];for(int i=0;i<n;i++)cin>>arr[i];
+        int j=p(arr,0,n-1);
+        qsort(arr,0,j-1);
+        send(n-j-1,1);
+        send_array(arr+j+1,n-j-1,1);
+        int n1;
+        receive(n1,1);
+        int brr[n1];
+        receive_array(brr,n1,1);
+        print_array(arr,j+1);
+        print_array(brr,n1);
+    }
+    if(rank==1){
         int n;
-        cin>>n;
+        receive(n,0);
         int arr[n];
-        for(int i=0;i<n;i++){
-            cin>>arr[i];
-        }
-        int p_size=n/numprocs;
-        if(p_size!=0){
-        for(int i=1;i<numprocs;i++){
-        send(p_size,i);
-        send_array(arr+p_size*(i-1),p_size,i);
-        }
-        vector<int*>res;
-        for(int i=1;i<numprocs;i++){
-            int temp[p_size];
-            receive_array(temp,p_size,i);
-            res.push_back(temp);
-        }
-        vector<int>ret(n);
-        for(int i=0;i<res.size()-1;i++){
-            // merge(res[i],res[i]+p_size,res[i+1],res[i+1]+p_size,ret.begin(),ret.end());
-        }
-         for(auto i:ret)cout<<i<<" ";
-        // }
-    }}
-    else{
-        int x;
-        receive(x,0);
-        if(x==INT_MAX){
-            return 0;
-        }
-        else{
-            int n;
-            receive(n,0);
-            int arr[n];
-            receive_array(arr,n,0);
-            qsort(arr,0,n-1);
-            send_array(arr,n,0);
-        }
-    }
-
-    MPI_Barrier( MPI_COMM_WORLD );
-    double elapsedTime = MPI_Wtime() - tbeg;
-    double maxTime;
-    MPI_Reduce( &elapsedTime, &maxTime, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
-    if ( rank == 0 ) {
-        printf( "Total time (s): %f\n", maxTime );
-    }
-
-    /* shut down MPI */
-    MPI_Finalize();
+        receive_array(arr,n,0);
+        qsort(arr,0,n-1);
+        send(n,0);
+        send_array(arr,n,0);
+    }   
+    FIN
     return 0;
 }
