@@ -1,7 +1,2 @@
 # Assignment-1-DS
-Jalees abhi hisaaban 1.cpp nai huva poora pr yeh toh HOGAAAAAA!!!!!!
-AUR YEH 2X FASTER HAI theoretically 
-ALSOOOOOOOOOOOOOOO
-OPTIMAL MERGE WALA PARALLEL QSORT FASTER HAI SEEEDHE QSORT SEEEEEEEEE.!!!!!!!!!!!!!1
-YEH PEHLE KYU NAI BOLAAAAAAAAAAAAAAA
-:'(
+
